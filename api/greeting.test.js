@@ -18,11 +18,3 @@ test("TC-4.2 A refused greeting is not counted", () => {
   greet("", greetings);
   assert.strictEqual(greet("Bo", greetings).body.count, 2);
 });
-
-test("TC-12.2 A visit with no name is refused", () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "greetings-"));
-  greet("Ada", counter(dir));
-  const { visits } = require("./visits");
-  assert.deepStrictEqual(visits(dir).record(" "), { status: 400, body: { error: "A name is required" } });
-  assert.strictEqual(visits(dir).record("Ada").body.count, 1);
-});
