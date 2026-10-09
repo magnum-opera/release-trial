@@ -1,0 +1,15 @@
+name: check
+on: pull_request
+permissions: { contents: read }
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - id: kind
+        run: echo "kind=$(scripts/paths.sh kind ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})" >> "$GITHUB_OUTPUT"
+      - if: steps.kind.outputs.kind != 'code'
+        run: echo "Passes by rule as ${{ steps.kind.outputs.kind }}."
+      - if: steps.kind.outputs.kind == 'code'
+        run: make check

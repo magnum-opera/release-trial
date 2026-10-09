@@ -1,0 +1,24 @@
+# One file for the local stack, staging and production. Staging and production
+# run images the deployment built (API_TAG, WEB_TAG) and never build here.
+services:
+  api:
+    image: rt-api:${API_TAG:-local}
+    build: { context: ., dockerfile: api/Dockerfile }
+    environment: { DATA_DIR: /data }
+    volumes: [data:/data]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 2s
+      retries: 15
+  web:
+    image: rt-web:${WEB_TAG:-local}
+    build: { context: ., dockerfile: web/Dockerfile }
+    environment: { API_URL: "http://api:3000" }
+    ports: ["${WEB_PORT:-3080}:8080"]
+    depends_on: { api: { condition: service_healthy } }
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 2s
+      retries: 15
+volumes:
+  data: {}

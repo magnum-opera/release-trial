@@ -1,0 +1,13 @@
+name: deploy-staging
+on:
+  push: { branches: [main] }
+concurrency: { group: staging, cancel-in-progress: false }
+permissions: { contents: read }
+jobs:
+  deploy:
+    runs-on: [self-hosted, release-trial]
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - run: scripts/deploy.sh staging ${{ github.sha }}

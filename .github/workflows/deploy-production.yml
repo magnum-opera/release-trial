@@ -1,0 +1,16 @@
+name: deploy-production
+on:
+  workflow_dispatch:
+    inputs:
+      sha: { description: "The commit the smoke run passed on", required: true }
+concurrency: { group: production, cancel-in-progress: false }
+permissions: { contents: write }
+jobs:
+  deploy:
+    runs-on: [self-hosted, release-trial]
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: "${{ inputs.sha }}", fetch-depth: 0 }
+      - run: scripts/deploy.sh production ${{ inputs.sha }}
+      - run: scripts/tag-release.sh ${{ inputs.sha }}
