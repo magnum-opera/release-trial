@@ -1,8 +1,10 @@
 const http = require("node:http");
 const { greet } = require("./greeting");
 const { counter } = require("./counter");
+const { visits } = require("./visits");
 
 const greetings = counter(process.env.DATA_DIR || "/data");
+const visitors = visits(process.env.DATA_DIR || "/data");
 
 function send(res, status, body) {
   res.writeHead(status, { "content-type": "application/json" });
@@ -16,6 +18,15 @@ http
     if (url.pathname === "/api/greeting") {
       try {
         const { status, body } = greet(url.searchParams.get("name"), greetings);
+        return send(res, status, body);
+      } catch (err) {
+        console.error(err);
+        return send(res, 500, { error: "Something went wrong" });
+      }
+    }
+    if (url.pathname === "/api/visits" && req.method === "POST") {
+      try {
+        const { status, body } = visitors.record(url.searchParams.get("name"));
         return send(res, status, body);
       } catch (err) {
         console.error(err);
