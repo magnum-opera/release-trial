@@ -13,7 +13,7 @@ http
     }
     if (req.url.startsWith("/api/")) {
       try {
-        const upstream = await fetch(API_URL + req.url);
+        const upstream = await fetch(API_URL + req.url, { method: req.method });
         res.writeHead(upstream.status, { "content-type": "application/json" });
         return res.end(await upstream.text());
       } catch {
