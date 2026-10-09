@@ -1,5 +1,8 @@
 const http = require("node:http");
 const { greet } = require("./greeting");
+const { counter } = require("./counter");
+
+const greetings = counter(process.env.DATA_DIR || "/data");
 
 function send(res, status, body) {
   res.writeHead(status, { "content-type": "application/json" });
@@ -12,7 +15,7 @@ http
     if (url.pathname === "/health") return send(res, 200, { ok: true });
     if (url.pathname === "/api/greeting") {
       try {
-        const { status, body } = greet(url.searchParams.get("name"));
+        const { status, body } = greet(url.searchParams.get("name"), greetings);
         return send(res, status, body);
       } catch (err) {
         console.error(err);
