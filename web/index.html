@@ -19,7 +19,13 @@
         const res = await fetch("/api/greeting?name=" + encodeURIComponent(name));
         const body = await res.json();
         document.getElementById("greeting").textContent = res.ok ? body.greeting : body.error;
-        document.getElementById("count").textContent = res.ok ? "Greetings given: " + body.count : "";
+        document.getElementById("count").textContent = "";
+        if (!res.ok) return;
+        const visit = await fetch("/api/visits?name=" + encodeURIComponent(name), { method: "POST" });
+        if (!visit.ok) return;
+        const seen = await visit.json();
+        const times = seen.count === 1 ? "1 time" : seen.count + " times";
+        document.getElementById("count").textContent = seen.name + " has been greeted " + times;
       });
     </script>
   </body>
