@@ -9,6 +9,7 @@ function visits(dir) {
       const trimmed = (name || "").trim();
       if (!trimmed) return { status: 400, body: { error: "A name is required" } };
       const data = JSON.parse(fs.readFileSync(file, "utf8"));
+      data.byName ??= {}; // a file kept from before per-name counts has none
       data.byName[trimmed] = (data.byName[trimmed] || 0) + 1;
       fs.writeFileSync(file, JSON.stringify(data));
       return { status: 200, body: { name: trimmed, count: data.byName[trimmed] } };
