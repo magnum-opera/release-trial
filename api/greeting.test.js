@@ -26,3 +26,11 @@ test("TC-12.2 A visit with no name is refused", () => {
   assert.deepStrictEqual(visits(dir).record(" "), { status: 400, body: { error: "A name is required" } });
   assert.strictEqual(visits(dir).record("Ada").body.count, 1);
 });
+
+test("TC-18.1 A visit is recorded on a greetings file kept from before per-name counts", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "greetings-"));
+  fs.writeFileSync(path.join(dir, "greetings.json"), JSON.stringify({ count: 41 }));
+  const { visits } = require("./visits");
+  assert.strictEqual(visits(dir).record("Ada").body.count, 1);
+  assert.strictEqual(JSON.parse(fs.readFileSync(path.join(dir, "greetings.json"), "utf8")).count, 41);
+});
